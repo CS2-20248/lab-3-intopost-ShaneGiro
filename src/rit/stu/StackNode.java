@@ -65,3 +65,4 @@ public class StackNode<T> implements Stack<T> {
         return this.top.getData();
     }
 }
+
