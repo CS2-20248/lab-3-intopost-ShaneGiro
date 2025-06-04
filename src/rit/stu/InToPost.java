@@ -44,7 +44,7 @@ import java.util.Scanner;
  *  A B + C * D E - -<br>
  * <br>
  * @author RIT CS
- * @author YOUR NAME HERE
+ * @author Shane Girolamo, seg8061@rit.edu
  */
 public class InToPost {
     /** The add operator */
@@ -124,9 +124,41 @@ public class InToPost {
      * @return a new queue of tokens (strings) in postfix form
      */
     private Queue<String> convert(List<String> tokens) {
-        // TODO
-        // YOUR IMPLEMENTATION HERE
-        return null;   // replace this
+        Queue<String> postfix = new QueueNode<>();
+        Stack<String> stack = new StackNode<>();
+
+        for (String token : tokens) {
+            /** Adds an open parenthesis to the stack */
+            if (token.equals(OPEN_PAREN)) {
+                stack.push(token);
+            /** Once you reach a close parenthesis, it adds values from stack to postfix until
+             *  it gets to the last open parenthesis, which it also removes. */
+            } else if (token.equals(CLOSE_PAREN)) {
+                while (!stack.empty() && !stack.top().equals(OPEN_PAREN)) {
+                    postfix.enqueue(stack.pop());
+                }
+                if (!stack.empty() && stack.top().equals(OPEN_PAREN)) {
+                    stack.pop();
+                }
+            /** Adds values to postfix. Either from the stack or the current token depending
+             *  on the precedence level.*/
+            } else if (this.precedence.get(token) != null) {
+                while (!stack.empty()
+                        && this.precedence.get(stack.top()) != null
+                        && greaterEqualPrecedence(stack.top(), token)) {
+                    postfix.enqueue(stack.pop());
+                }
+                stack.push(token);
+            /** Adds letters to postfix */
+            } else {
+                postfix.enqueue(token);
+            }
+        }
+        /** Adds all remaining operators in the stack to postfix */
+        while (!stack.empty()) {
+            postfix.enqueue(stack.pop());
+        }
+        return postfix;
     }
 
     /**
